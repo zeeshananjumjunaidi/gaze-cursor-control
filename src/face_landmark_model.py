@@ -68,7 +68,7 @@ class FacialLandmarksDetectionModel:
         h=image.shape[0]
         w=image.shape[1]
         coords = coords* np.array([w, h, w, h])
-        coords = coords.astype(np.int32) #(lefteye_x, lefteye_y, righteye_x, righteye_y)
+        coords = coords.astype(np.int32)
         le_xmin=coords[0]-10
         le_ymin=coords[1]-10
         le_xmax=coords[0]+10
@@ -78,9 +78,7 @@ class FacialLandmarksDetectionModel:
         re_ymin=coords[3]-10
         re_xmax=coords[2]+10
         re_ymax=coords[3]+10
-        #cv2.rectangle(image,(le_xmin,le_ymin),(le_xmax,le_ymax),(255,0,0))
-        #cv2.rectangle(image,(re_xmin,re_ymin),(re_xmax,re_ymax),(255,0,0))
-        #cv2.imshow("Image",image)
+
         left_eye =  image[le_ymin:le_ymax, le_xmin:le_xmax]
         right_eye = image[re_ymin:re_ymax, re_xmin:re_xmax]
         eye_coords = [[le_xmin,le_ymin,le_xmax,le_ymax], [re_xmin,re_ymin,re_xmax,re_ymax]]

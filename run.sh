@@ -12,11 +12,12 @@ GAZE_ESTIMATION_MODEL="intel/gaze-estimation-adas-0002/FP16/gaze-estimation-adas
 HEAD_POSE_ESTIMATION_MODEL="intel/head-pose-estimation-adas-0001/FP16/head-pose-estimation-adas-0001.xml"
 # Using 16FP model for landmkars regression model
 LANDMARKS_REGRESSION_MODEL="intel/landmarks-regression-retail-0009/FP16-INT8/landmarks-regression-retail-0009.xml"
+# Useful incase of camera is set to flip horizontally.
+FLIP_INPUT_HORIZONTAL="False"
+# Input stream its value could be "CAM" or <video file link>
+INPUT="bin/demo.mp4" #"CAM"
+# Device to use for for inference, values are "CPU", "GPU", "HETERO:FPGA,CPU"
+DEVICE="CPU"
 
-# Test Video File
-python3.5 src/main.py -d "CPU"  -fliph "False" --previewFlags "fd" "hp" "fld" "ge" -i "bin/demo.mp4" -f $FACE_DETECTION_MODEL -g $GAZE_ESTIMATION_MODEL -hp $HEAD_POSE_ESTIMATION_MODEL -fl $LANDMARKS_REGRESSION_MODEL
-# Test Camera
-#python3.5 src/main.py -d "CPU" -fliph "False" --previewFlags "fd" "hp" "fld" "ge" -i "CAM" -f $FACE_DETECTION_MODEL -g $GAZE_ESTIMATION_MODEL -hp $HEAD_POSE_ESTIMATION_MODEL -fl $LANDMARKS_REGRESSION_MODEL
+python3.5 src/main.py -d $DEVICE  -fliph $FLIP_INPUT_HORIZONTAL --previewFlags "fd" "hp" "fld" "ge" -i $INPUT -f $FACE_DETECTION_MODEL -g $GAZE_ESTIMATION_MODEL -hp $HEAD_POSE_ESTIMATION_MODEL -fl $LANDMARKS_REGRESSION_MODEL
 
-#Test Camera Without Preview
-#python3.5 src/main.py -d "CPU" -fliph "True" -i "CAM" -f $FACE_DETECTION_MODEL -g $GAZE_ESTIMATION_MODEL -hp $HEAD_POSE_ESTIMATION_MODEL -fl $LANDMARKS_REGRESSION_MODEL
