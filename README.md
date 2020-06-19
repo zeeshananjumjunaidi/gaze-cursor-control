@@ -4,6 +4,32 @@
 
 ## Project Set Up and Installation
 *TODO:* Explain the setup procedures to run your project. For instance, this can include your project directory structure, the models you need to download and where to place them etc. Also include details about how to install the dependencies your project requires.
+### Step: 1
+Clone the repository:- https://github.com/zeeshananjumjunaidi/gaze-cursor-control
+### Step: 2
+Initialize the openVINO environment:-
+```
+source /opt/intel/openvino/bin/setupvars.sh -pyver 3.5
+```
+### Step 3
+Download following models by using OpenVINO model downloader
+
+- **1. Face Detection Model**
+```
+python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "face-detection-adas-binary-0001"
+```
+- **2. Facial Landmarks Detection Model**
+```
+python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "landmarks-regression-retail-0009"
+```
+- **3. Head Pose Estimation Model**
+```
+python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "head-pose-estimation-adas-0001"
+```
+- **4. Gaze Estimation Model**
+```
+python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "gaze-estimation-adas-0002"
+```
 
 ## Demo
 *TODO:* Explain how to run a basic demo of your model.
