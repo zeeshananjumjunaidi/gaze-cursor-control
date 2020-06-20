@@ -40,12 +40,12 @@ You can edit run.sh to change parameteres, like if you want to provide video fil
 Paramters can be changed in run.sh
 All variables are self explanatory.
 
-- FACE_DETECTION_MODEL <Path of xml file of face detection model> \
-- LANDMARKS_REGRESSION_MODEL <Path of xml file of facial landmarks detection model> \
-- HEAD_POSE_ESTIMATION_MODEL <Path of xml file of head pose estimation model> \
-- GAZE_ESTIMATION_MODEL <Path of xml file of gaze estimation model> \
-- INPUT <Path of video file or camera, input values are either link of video file or "CAM" for camera input> 
-- DEVICE <Use processing unit for inference, values are CPU, GPU, or HETERO:FPGA,CPU>
+- FACE_DETECTION_MODEL \<Path of xml file of face detection model>
+- LANDMARKS_REGRESSION_MODEL \<Path of xml file of facial landmarks detection model>
+- HEAD_POSE_ESTIMATION_MODEL \<Path of xml file of head pose estimation model>
+- GAZE_ESTIMATION_MODEL \<Path of xml file of gaze estimation model>
+- INPUT \<Path of video file or camera, input values are either link of video file or "CAM" for camera input> 
+- DEVICE \<Use processing unit for inference, values are CPU, GPU, or HETERO:FPGA,CPU>
 
 ## Documentation
 
