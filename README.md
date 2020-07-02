@@ -3,7 +3,7 @@
 Gaze Cursor Control program is designed to controll mouse pointer using realtime gaze input. This will also include the head orientation. User can provide either video or live camera streaming as input.
 
 ## Project Set Up and Installation
-*TODO:* Explain the setup procedures to run your project. For instance, this can include your project directory structure, the models you need to download and where to place them etc. Also include details about how to install the dependencies your project requires.
+
 ### Step: 1
 Clone the repository: https://github.com/zeeshananjumjunaidi/gaze-cursor-control
 ### Step: 2
@@ -32,6 +32,8 @@ python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py
 ```
 
 ## Demo
+
+Edit run.sh and update the path of models.
 
 Open terminal and navigate to project root directory.
 Then run ```./run.sh```
@@ -72,16 +74,16 @@ All variables are self explanatory.
 
 ## Benchmarks
 
-### Model Load Time** <br/> 
-
-
-
-
-
+|          Device          | Model Load Time (FPS) | Inference Time (s) |
+|:------------------------:|:---------------------:|:------------------:|
+| Intel Core i5-6500TE CPU |           24          |         11         |
+| Intel Core i5-6500TE GPU |           20          |         13         |
+| IE Mustang F100-A10 FPGA |           20          |         12         |
+|        Intel NCS2        |           22          |         11         |
 
 ## Results
 *TODO:* Discuss the benchmark results and explain why you are getting the results you are getting. For instance, explain why there is difference in inference time for FP32, FP16 and INT8 models.
-As you can see 
+Seems like on Intel Dev Cloud performance is not good enough
 
 ### Async Inference
 If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
