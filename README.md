@@ -74,12 +74,21 @@ All variables are self explanatory.
 
 ## Benchmarks
 
-|          Device          | Model Load Time (FPS) | Inference Time (s) |
-|:------------------------:|:---------------------:|:------------------:|
-| Intel Core i5-6500TE CPU |           24          |         11         |
-| Intel Core i5-6500TE GPU |           20          |         13         |
-| IE Mustang F100-A10 FPGA |           20          |         12         |
-|        Intel NCS2        |           22          |         11         |
+Average result
+
+|            Name           | Model Load Time FP32 | Inference time (FP32) |
+|:-------------------------:|:------------:|:--------------------------:|
+| Face detection            | 0.354        | 0.041                      |
+| Face Landmark detection   | 0.878        | 0.003                      |
+| Head Pose Estimation      | 0.155        | 0.003                      |
+| Gaze Estimation           | 0.526        | 0.004                      |
+
+|            Name           | Model Load Time FP16 | Inference time (FP16) |
+|:-------------------------:|:------------:|:------------------------:|
+| Face detection            | 2.057           | 0.120                      |
+| Facial Landmark detection | 1.800        | 0.004                    |
+| Head Pose detection       | 0.400        | 0.002                    |
+| Gaze Estimation           | 0.297        | 0.003                    |
 
 ## Results
 *TODO:* Discuss the benchmark results and explain why you are getting the results you are getting. For instance, explain why there is difference in inference time for FP32, FP16 and INT8 models.
