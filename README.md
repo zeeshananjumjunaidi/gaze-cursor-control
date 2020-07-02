@@ -78,24 +78,22 @@ Average result
 
 |            Name           | Model Load Time FP32 | Inference time (FP32) |
 |:-------------------------:|:------------:|:--------------------------:|
-| Face detection            | 0.354        | 0.041                      |
-| Face Landmark detection   | 0.878        | 0.003                      |
-| Head Pose Estimation      | 0.155        | 0.003                      |
-| Gaze Estimation           | 0.526        | 0.004                      |
+| Face detection            | 0.172        | 0.008                      |
+| Face Landmark detection   | 0.057        | 0.0007                      |
+| Head Pose Estimation      | 0.062        | 0.002                      |
+| Gaze Estimation           | 0.080        | 0.001                      |
 
 |            Name           | Model Load Time FP16 | Inference time (FP16) |
 |:-------------------------:|:------------:|:------------------------:|
-| Face detection            | 2.057           | 0.120                      |
-| Facial Landmark detection | 1.800        | 0.004                    |
-| Head Pose detection       | 0.400        | 0.002                    |
-| Gaze Estimation           | 0.297        | 0.003                    |
+| Face detection            | 0.348           | 0.013                      |
+| Facial Landmark detection | 0.105        | 0.0001                    |
+| Head Pose detection       | 0.173        | 0.002                    |
+| Gaze Estimation           | 0.170       | 0.003                    |
 
 ## Results
-*TODO:* Discuss the benchmark results and explain why you are getting the results you are getting. For instance, explain why there is difference in inference time for FP32, FP16 and INT8 models.
-Seems like on Intel Dev Cloud performance is not good enough
 
-### Async Inference
-If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
+I tested this program on Intel i7 (7700K) VM. From the results, it seems like FP16 too long time for loading, but for i7 (7700K) there is not much difference in inference.
+
 
 ### Edge Cases
 1. If program unable to find face in video input, it will print 'Unable to detect the face' and continue to read another frame.
