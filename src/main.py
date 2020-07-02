@@ -1,6 +1,7 @@
 
 import cv2
 import os
+import time
 import logging
 import numpy as np
 from argparse import ArgumentParser
@@ -11,6 +12,11 @@ from face_detection_model import FaceDetectionModel
 from head_pose_model import HeadPoseEstimationModel
 from gaze_estimation_model import GazeEstimationModel
 from face_landmark_model import FacialLandmarksDetectionModel
+
+
+logger = logging.getLogger()
+
+benchmarks = {}
 
 def build_arg_parser():
 
@@ -45,9 +51,9 @@ def build_arg_parser():
                              "will look for a suitable plugin for device "
                              "specified (CPU by default)")
 
-    parser.add_argument("-fliph", "--flip_horizontal", required=True, type=bool,
-                        default=True,
-                        help="Flipping input horizontally")
+    parser.add_argument("-fliph", "--flip_horizontal", required=True, type=str,
+                        default="False",
+                        help="Flip input horizontally")
     
     return parser
 
@@ -61,8 +67,6 @@ def main():
 
     inputFilePath = args.input
     inputFeeder = None
-
-    logger = logging.getLogger()
 
     if inputFilePath.lower()=="cam":
             inputFeeder = InputFeeder("cam")
@@ -78,7 +82,7 @@ def main():
     gaze_estimation_link=args.gazeestimationmodel
     head_pose_link=args.headposemodel
     if is_model_exists(face_model_link) and is_model_exists(facial_landmark_link) and is_model_exists(gaze_estimation_link) and is_model_exists(head_pose_link):
-        print("Exit")
+        logger.log("Model not found! closing app...")
         exit(1)
     
     device_name = args.device
@@ -86,7 +90,7 @@ def main():
     threshold = args.prob_threshold
     previewFlags = args.previewFlags
     
-    fliph = True if args.flip_horizontal == "True" else False
+    fliph = True if str(args.flip_horizontal).lower() == "true" else False
 
     # Initialize Models
     face_model=FaceDetectionModel(face_model_link,device_name,cpu_extension)
@@ -94,12 +98,31 @@ def main():
     gaze_estimation_model=GazeEstimationModel(gaze_estimation_link,device_name,cpu_extension)
     head_pose_model=HeadPoseEstimationModel(head_pose_link,device_name,cpu_extension)
 
+    fm_time = time.time()
     face_model.load_model()
-    facial_landmark_model.load_model()
-    gaze_estimation_model.load_model()
-    head_pose_model.load_model()
+    fm_time = time.time() - fm_time
 
-    mouse_controller = MouseController('medium','slow')
+    flm_time = time.time()
+    facial_landmark_model.load_model()
+    flm_time = time.time() - flm_time
+
+    gem_time = time.time()
+    gaze_estimation_model.load_model()
+    gem_time = time.time() - gem_time
+
+    hpm_time = time.time()
+    head_pose_model.load_model()
+    hpm_time = time.time() - hpm_time
+
+    benchmarks['loadtime'] = {}
+
+    benchmarks['loadtime']['face_landmark'] = flm_time
+    benchmarks['loadtime']['face_detection'] = fm_time
+    benchmarks['loadtime']['gaze_estimation'] = gem_time
+    benchmarks['loadtime']['head_pose_estimation'] = hpm_time
+
+
+    mouse_controller = MouseController('medium','fast')
     inputFeeder.load_data()
 
     frame_count = 0
@@ -114,8 +137,10 @@ def main():
 
         key = cv2.waitKey(60)
         if fliph:
-            frame = cv2.flip(frame,0)
+            frame = cv2.flip(frame,1)
+        face_detection_predict_time = time.time()    
         croppedFace, face_coords = face_model.predict(frame.copy())
+        face_detection_predict_time = time.time()- face_detection_predict_time
 
         if type(croppedFace)==int:# or type(croppedFace)==np.float32:
             logger.error("Unable to detect the face.")
@@ -124,23 +149,37 @@ def main():
             continue
 
         # Head Pose prediction
+
+        head_pose_predict_time = time.time()
         head_output = head_pose_model.predict(croppedFace.copy())
-        print(head_output)
+        head_pose_predict_time = time.time() - head_pose_predict_time
+        #print(head_output)
         # Eyes and its coordinate prediction
+        facial_landmark_predict_time = time.time()
         left_eye, right_eye, eye_coords = facial_landmark_model.predict(croppedFace.copy())
+        facial_landmark_predict_time = time.time() - facial_landmark_predict_time
+
         #print(left_eye,right_eye,eye_coords)
-        using_only_head_movement=True
+        using_only_head_movement=False
         if using_only_head_movement:
             new_mouse_coord = -head_output[0] *0.5,-head_output[1]*0.5
             gaze_vector=None
+            gaze_estimation_predict_time = -1
         else:
             # Gaze Estimation prediction
+            gaze_estimation_predict_time = time.time()
             new_mouse_coord, gaze_vector = gaze_estimation_model.predict(left_eye, right_eye, head_output)
+            gaze_estimation_predict_time = time.time() - gaze_estimation_predict_time
 
-        
+        benchmarks['predict_time'] = {}
+        benchmarks['predict_time']['face_landmark'] = facial_landmark_predict_time
+        benchmarks['predict_time']['face_detection'] = face_detection_predict_time
+        benchmarks['predict_time']['gaze_estimation'] = gaze_estimation_predict_time
+        benchmarks['predict_time']['head_pose_estimation'] = head_pose_predict_time
+        print(benchmarks)
         if (not len(previewFlags)==0):
             preview_frame = frame.copy()
-            print('fd' in previewFlags,'hp' in previewFlags,'fld' in previewFlags )
+            #print('fd' in previewFlags,'hp' in previewFlags,'fld' in previewFlags )
             if 'fd' in previewFlags:
                 cv2.rectangle(preview_frame, (face_coords[0], face_coords[1]), (face_coords[2], face_coords[3]), (255,0,0), 2)
                 preview_frame = croppedFace
@@ -165,10 +204,10 @@ def main():
         
         if frame_count%5==0:
             print("moving mouse")
-        mouse_controller.move(new_mouse_coord[0],new_mouse_coord[1],using_only_head_movement)    
+        mouse_controller.move(new_mouse_coord[0],new_mouse_coord[1])    
         if key==27:
                 break
-    logger.error("VideoStream ended...")
+    logger.log("Video Stream Finished...")
     cv2.destroyAllWindows()
     inputFeeder.close()
 

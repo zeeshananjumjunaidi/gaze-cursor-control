@@ -13,14 +13,11 @@ class MouseController:
     def __init__(self, precision, speed):
         precision_dict={'high':100, 'low':1000, 'medium':500}
         speed_dict={'fast':1, 'slow':10, 'medium':5}
-        pyautogui.FAILSAFE=False
+        
+        #pyautogui.FAILSAFE=False
         self.precision=precision_dict[precision]
         self.speed=speed_dict[speed]
-        self.screen_width = 500
-        self.screen_height = 600
 
-    def move(self, x, y,using_only_head_movement):
-        if using_only_head_movement:
-            pyautogui.moveRel(x*self.screen_width, -1*y*self.screen_height, duration=self.speed)
-        else:
+
+    def move(self, x, y):
             pyautogui.moveRel(x*self.precision, -1*y*self.precision, duration=self.speed)
