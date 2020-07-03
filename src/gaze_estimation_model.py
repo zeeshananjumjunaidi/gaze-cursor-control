@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 from openvino.inference_engine import IECore
 import math
+import logging
+
+logger = logging.getLogger()
 
 class GazeEstimationModel:
     '''
@@ -37,18 +40,18 @@ class GazeEstimationModel:
         
         
         if len(unsupported_layers)!=0 and self.device=='CPU':
-            print("unsupported layers found:{}".format(unsupported_layers))
+            logger.warn("unsupported layers found:{}".format(unsupported_layers))
             if not self.extensions==None:
-                print("Adding cpu_extension")
+                lgogger.info("Adding cpu_extension")
                 self.plugin.add_extension(self.extensions, self.device)
                 supported_layers = self.plugin.query_network(network = self.network, device_name=self.device)
                 unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
                 if len(unsupported_layers)!=0:
-                    print("After adding the extension still unsupported layers found")
+                    logger.error("After adding the extension still unsupported layers found")
                     exit(1)
-                print("After adding the extension the issue is resolved")
+                logger.info("After adding the extension the issue is resolved")
             else:
-                print("Give the path of cpu extension")
+                logger.warn("Give the path of cpu extension")
                 exit(1)
                 
         self.exec_net = self.plugin.load_network(network=self.network, device_name=self.device,num_requests=1)
@@ -70,18 +73,21 @@ class GazeEstimationModel:
         return new_mouse_coord, gaze_vector
 
     def check_model(self):
-        ''
+        pass
 
     def preprocess_input(self, left_eye, right_eye):
         '''
         Before feeding the data into the model for inference,
         you might have to preprocess it. This function is where you can do that.
         '''
-        le_image_resized = cv2.resize(left_eye, (self.input_shape[3], self.input_shape[2]))
-        re_image_resized = cv2.resize(right_eye, (self.input_shape[3], self.input_shape[2]))
-        le_img_processed = np.transpose(np.expand_dims(le_image_resized,axis=0), (0,3,1,2))
-        re_img_processed = np.transpose(np.expand_dims(re_image_resized,axis=0), (0,3,1,2))
-        return le_img_processed, re_img_processed
+        
+        if(len(self.input_shape)==4):
+            le_image_resized = cv2.resize(left_eye, (self.input_shape[3], self.input_shape[2]))
+            re_image_resized = cv2.resize(right_eye, (self.input_shape[3], self.input_shape[2]))
+            le_img_processed = np.transpose(np.expand_dims(le_image_resized,axis=0), (0,3,1,2))
+            re_img_processed = np.transpose(np.expand_dims(re_image_resized,axis=0), (0,3,1,2))            
+            return le_img_processed, re_img_processed
+        return False,False
             
 
     def preprocess_output(self, outputs,hpa):

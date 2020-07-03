@@ -17,10 +17,10 @@ LANDMARKS_REGRESSION_MODEL="models/intel/landmarks-regression-retail-0009/FP32/l
 # To flip camera input horizontally
 FLIP_INPUT_HORIZONTAL="True"
 # Input stream, Value could be "CAM" or <video file link>
-INPUT="cam"
-#INPUT="bin/demo.mp4"
+#INPUT="cam"
+INPUT="bin/demo.mp4"
 # Device to use for for inference, values are "CPU", "GPU", "HETERO:FPGA,CPU"
-DEVICE="GPU"
+DEVICE="CPU"
 
 # To learn all parameters of this program run following command
 # python3.5 src/main.py --help

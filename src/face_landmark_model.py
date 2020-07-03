@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 from openvino.inference_engine import IECore
+import logging
+
+logger = logging.getLogger()
 
 class FacialLandmarksDetectionModel:
     '''
@@ -36,18 +39,18 @@ class FacialLandmarksDetectionModel:
         
         
         if len(unsupported_layers)!=0 and self.device=='CPU':
-            print("unsupported layers found:{}".format(unsupported_layers))
+            logger.warn("unsupported layers found:{}".format(unsupported_layers))
             if not self.extensions==None:
-                print("Adding cpu_extension")
+                logger.info("Adding cpu_extension")
                 self.plugin.add_extension(self.extensions, self.device)
                 supported_layers = self.plugin.query_network(network = self.network, device_name=self.device)
                 unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
                 if len(unsupported_layers)!=0:
-                    print("After adding the extension still unsupported layers found")
+                    logger.error("After adding the extension still unsupported layers found")
                     exit(1)
-                print("After adding the extension the issue is resolved")
+                logger.info("After adding the extension the issue is resolved")
             else:
-                print("Give the path of cpu extension")
+                logger.warn("Give the path of cpu extension")
                 exit(1)
                 
         self.exec_net = self.plugin.load_network(network=self.network, device_name=self.device,num_requests=1)

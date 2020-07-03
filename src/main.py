@@ -5,7 +5,7 @@ import time
 import logging
 import numpy as np
 from argparse import ArgumentParser
-
+import sys
 from input_feeder import InputFeeder
 from mouse_controller import MouseController
 from face_detection_model import FaceDetectionModel
@@ -13,8 +13,12 @@ from head_pose_model import HeadPoseEstimationModel
 from gaze_estimation_model import GazeEstimationModel
 from face_landmark_model import FacialLandmarksDetectionModel
 
+f_handler = logging.FileHandler('file.log')
 
-logger = logging.getLogger()
+logger = logging.getLogger('gaze_cursor_control')
+
+logger.setLevel(logging.DEBUG)
+logger.addHandler(f_handler)
 
 benchmarks = {}
 
@@ -128,12 +132,10 @@ def main():
     frame_count = 0
 
     for ret, frame in inputFeeder.next_batch():
+        FPS_COUNT = time.time()
         if not ret:
             break
         frame_count+=1
-
-        # if frame_count%5==0:
-        #     cv2.imshow('video',cv2.resize(frame,(500,500)))
 
         key = cv2.waitKey(60)
         if fliph:
@@ -142,7 +144,7 @@ def main():
         croppedFace, face_coords = face_model.predict(frame.copy())
         face_detection_predict_time = time.time()- face_detection_predict_time
 
-        if type(croppedFace)==int:# or type(croppedFace)==np.float32:
+        if croppedFace is None or croppedFace is 0:
             logger.error("Unable to detect the face.")
             if key==27:
                 break
@@ -153,13 +155,12 @@ def main():
         head_pose_predict_time = time.time()
         head_output = head_pose_model.predict(croppedFace.copy())
         head_pose_predict_time = time.time() - head_pose_predict_time
-        #print(head_output)
-        # Eyes and its coordinate prediction
+
+
         facial_landmark_predict_time = time.time()
         left_eye, right_eye, eye_coords = facial_landmark_model.predict(croppedFace.copy())
         facial_landmark_predict_time = time.time() - facial_landmark_predict_time
 
-        #print(left_eye,right_eye,eye_coords)
         using_only_head_movement=False
         if using_only_head_movement:
             new_mouse_coord = -head_output[0] *0.5,-head_output[1]*0.5
@@ -171,23 +172,25 @@ def main():
             new_mouse_coord, gaze_vector = gaze_estimation_model.predict(left_eye, right_eye, head_output)
             gaze_estimation_predict_time = time.time() - gaze_estimation_predict_time
 
+        FPS_COUNT = time.time()-FPS_COUNT
+        FPS_COUNT = 1//FPS_COUNT
+        logger.debug("FPS %s"%(FPS_COUNT))
         benchmarks['predict_time'] = {}
         benchmarks['predict_time']['face_landmark'] = facial_landmark_predict_time
         benchmarks['predict_time']['face_detection'] = face_detection_predict_time
         benchmarks['predict_time']['gaze_estimation'] = gaze_estimation_predict_time
         benchmarks['predict_time']['head_pose_estimation'] = head_pose_predict_time
-        print(benchmarks)
+        logger.debug(benchmarks)
         if (not len(previewFlags)==0):
             preview_frame = frame.copy()
-            #print('fd' in previewFlags,'hp' in previewFlags,'fld' in previewFlags )
             if 'fd' in previewFlags:
-                cv2.rectangle(preview_frame, (face_coords[0], face_coords[1]), (face_coords[2], face_coords[3]), (255,0,0), 2)
+                cv2.rectangle(preview_frame, (face_coords[0], face_coords[1]), (face_coords[2], face_coords[3]), (255,0,0), 1)
                 preview_frame = croppedFace
             if 'fld' in previewFlags:
-                cv2.rectangle(croppedFace, (eye_coords[0][0]-10, eye_coords[0][1]-10), (eye_coords[0][2]+10, eye_coords[0][3]+10), (0,255,0), 2)
-                cv2.rectangle(croppedFace, (eye_coords[1][0]-10, eye_coords[1][1]-10), (eye_coords[1][2]+10, eye_coords[1][3]+10), (0,255,0), 2)
+                cv2.rectangle(croppedFace, (eye_coords[0][0]-10, eye_coords[0][1]-10), (eye_coords[0][2]+10, eye_coords[0][3]+10), (0,255,0), 1)
+                cv2.rectangle(croppedFace, (eye_coords[1][0]-10, eye_coords[1][1]-10), (eye_coords[1][2]+10, eye_coords[1][3]+10), (0,255,0), 1)
                 #preview_frame[face_coords[1]:face_coords[3], face_coords[0]:face_coords[2]] = croppedFace
-                
+
             if 'hp' in previewFlags:
                 cv2.putText(preview_frame, "Pose Angles: yaw:{:.2f} | pitch:{:.2f} | roll:{:.2f}".format(head_output[0],head_output[1],head_output[2]), (10, 20), cv2.FONT_HERSHEY_COMPLEX, 0.25, (0, 255, 0), 1)
             if 'ge' in previewFlags and gaze_vector:
@@ -203,15 +206,18 @@ def main():
             cv2.imshow("visualization",cv2.resize(preview_frame,(500,500)))
         
         if frame_count%5==0:
-            print("moving mouse")
-        mouse_controller.move(new_mouse_coord[0],new_mouse_coord[1])    
+            logger.debug("moving mouse: {}".format(new_mouse_coord))
+            mouse_controller.move(new_mouse_coord[0],new_mouse_coord[1])    
         if key==27:
                 break
-    logger.log("Video Stream Finished...")
+    logger.info("Video Stream Finished...")
     cv2.destroyAllWindows()
     inputFeeder.close()
 
 
 if __name__ == '__main__':
     args = build_arg_parser().parse_args()
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.error(e.with_traceback())

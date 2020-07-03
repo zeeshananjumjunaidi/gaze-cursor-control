@@ -58,6 +58,49 @@ All variables are self explanatory.
 - [Head Pose Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_head_pose_estimation_adas_0001_description_head_pose_estimation_adas_0001.html)
 - [Gaze Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_gaze_estimation_adas_0002_description_gaze_estimation_adas_0002.html)
 
+### Paramters
+
+```
+usage: main.py [-h] -f FACEDETECTIONMODEL -fl FACIALLANDMARKMODEL -hp
+               HEADPOSEMODEL -g GAZEESTIMATIONMODEL -i INPUT
+               [-flags PREVIEWFLAGS [PREVIEWFLAGS ...]] [-l CPU_EXTENSION]
+               [-prob PROB_THRESHOLD] [-d DEVICE] -fliph FLIP_HORIZONTAL
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FACEDETECTIONMODEL, --facedetectionmodel FACEDETECTIONMODEL
+                        Specify Path to .xml file of Face Detection model.
+  -fl FACIALLANDMARKMODEL, --faciallandmarkmodel FACIALLANDMARKMODEL
+                        Specify Path to .xml file of Facial Landmark Detection
+                        model.
+  -hp HEADPOSEMODEL, --headposemodel HEADPOSEMODEL
+                        Specify Path to .xml file of Head Pose Estimation
+                        model.
+  -g GAZEESTIMATIONMODEL, --gazeestimationmodel GAZEESTIMATIONMODEL
+                        Specify Path to .xml file of Gaze Estimation model.
+  -i INPUT, --input INPUT
+                        Specify Path to video file or enter cam for webcam
+  -flags PREVIEWFLAGS [PREVIEWFLAGS ...], --previewFlags PREVIEWFLAGS [PREVIEWFLAGS ...]
+                        Specify the flags from fd, fld, hp, ge like --flags fd
+                        hp fld (Seperate each flag by space)for see the
+                        visualization of different model outputs of each
+                        frame,fd for Face Detection, fld for Facial Landmark
+                        Detectionhp for Head Pose Estimation, ge for Gaze
+                        Estimation.
+  -l CPU_EXTENSION, --cpu_extension CPU_EXTENSION
+                        MKLDNN (CPU)-targeted custom layers.Absolute path to a
+                        shared library with thekernels impl.
+  -prob PROB_THRESHOLD, --prob_threshold PROB_THRESHOLD
+                        Probability threshold for model to detect the face
+                        accurately from the video frame.
+  -d DEVICE, --device DEVICE
+                        Specify the target device to infer on: CPU, GPU, FPGA
+                        or MYRIAD is acceptable. Sample will look for a
+                        suitable plugin for device specified (CPU by default)
+  -fliph FLIP_HORIZONTAL, --flip_horizontal FLIP_HORIZONTAL
+                        Flip input horizontally
+```
+
 ### Project Structure
 
 - .run.sh Main file to run the Gaze Cursor Control pipeline. 
@@ -82,6 +125,8 @@ Average result
 | Face Landmark detection   | 0.057        | 0.0007                      |
 | Head Pose Estimation      | 0.062        | 0.002                      |
 | Gaze Estimation           | 0.080        | 0.001                      |
+|:-------------------------:|:------------:|:--------------------------:|
+| Total Average             | 0.092          |0.003                      |
 
 |            Name           | Model Load Time FP16 | Inference time (FP16) |
 |:-------------------------:|:------------:|:------------------------:|
@@ -89,10 +134,20 @@ Average result
 | Facial Landmark detection | 0.105        | 0.0001                    |
 | Head Pose detection       | 0.173        | 0.002                    |
 | Gaze Estimation           | 0.170       | 0.003                    |
+|:-------------------------:|:------------:|:--------------------------:|
+| Total Average Inference   | 0.199       | 0.004                    |
+
+
+
+|   Model Type  |   FPS     |
+|:----------:|:------------:|
+|   FP32        |  ~13FPS    |
+|   FP16        |  ~12FPS         |
+
 
 ## Results
 
-I tested this program on Intel i7 (7700K) VM. From the results, it seems like FP16 too long time for loading, but for i7 (7700K) there is not much difference in inference.
+I tested this program on Intel i7 (7700K) VM. From the results, it seems like FP16 too long time for loading, but for i7 (7700K) there is not much difference in inference as FPS are almost similar in both type of models.
 
 
 ### Edge Cases
