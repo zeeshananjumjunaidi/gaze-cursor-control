@@ -145,8 +145,29 @@ Average result
 
 ## Results
 
-I tested this program on Intel i7 (7700K) VM. From the results, it seems like FP16 too long time for loading, but for i7 (7700K) there is not much difference in inference as FPS are almost similar in both type of the models.
+I tested this program on Intel i7 (7700K) VM. From the results, it seems like FP16 too long time for loading, but for i7 (7700K) loading time is low and there is not much difference in model inference as FPS are almost similar in both type of the models.
+Higher floating point precision usually have higher accuracy.
+Normally precision model usually takes more time for inference than lower precision models.
+From the result, we can see that loading time of FP16 is slower than the FP32 by 10ms.
+We prefer using lower precision model when we have constraints such as low power consumption and less processing power.
 
+<hr/>
+### Testing face detection model on different hardware.
+
+I tested Face detection model on multiple devices.
+- CPU - i5-6500te:iei-mustang-f100-a10  - FP32
+- IGPU - i5-6500te:intel-hd-530 - FP32
+- VPU - intel-ncs2 - FP32
+- FPGA - iei-mustang-f100-a10 - FP16
+
+#### Model Loading Time
+![Model Loading Time](./images/model-loading-time.png)
+
+#### Inference Time 
+![Model Inference Time](./images/model-inference-time.png)
+
+#### FPS
+![Frame Per Seconds](./images/fps.png)
 
 ### Edge Cases
 1. If program unable to find face in video input, it will print 'Unable to detect the face' and continue to read another frame.
