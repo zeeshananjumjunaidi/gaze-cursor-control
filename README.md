@@ -152,6 +152,7 @@ From the result, we can see that loading time of FP16 is slower than the FP32 by
 We prefer using lower precision model when we have constraints such as low power consumption and less processing power.
 
 <hr/>
+
 ### Testing face detection model on different hardware.
 
 I tested Face detection model on multiple devices.
