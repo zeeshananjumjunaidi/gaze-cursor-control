@@ -125,8 +125,7 @@ Average result
 | Face Landmark detection   | 0.057        | 0.0007                      |
 | Head Pose Estimation      | 0.062        | 0.002                      |
 | Gaze Estimation           | 0.080        | 0.001                      |
-|:-------------------------:|:------------:|:--------------------------:|
-| Total Average             | 0.092          |0.003                      |
+| **Total Average**             | 0.092          |0.003                      |
 
 |            Name           | Model Load Time FP16 | Inference time (FP16) |
 |:-------------------------:|:------------:|:------------------------:|
@@ -134,8 +133,7 @@ Average result
 | Facial Landmark detection | 0.105        | 0.0001                    |
 | Head Pose detection       | 0.173        | 0.002                    |
 | Gaze Estimation           | 0.170       | 0.003                    |
-|:-------------------------:|:------------:|:--------------------------:|
-| Total Average Inference   | 0.199       | 0.004                    |
+| **Total Average Inference**   | 0.199       | 0.004                    |
 
 
 
@@ -147,7 +145,7 @@ Average result
 
 ## Results
 
-I tested this program on Intel i7 (7700K) VM. From the results, it seems like FP16 too long time for loading, but for i7 (7700K) there is not much difference in inference as FPS are almost similar in both type of models.
+I tested this program on Intel i7 (7700K) VM. From the results, it seems like FP16 too long time for loading, but for i7 (7700K) there is not much difference in inference as FPS are almost similar in both type of the models.
 
 
 ### Edge Cases
