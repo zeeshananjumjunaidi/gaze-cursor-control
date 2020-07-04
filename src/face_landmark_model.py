@@ -1,9 +1,11 @@
 import cv2
 import logging
 import numpy as np
+import configuration
 from openvino.inference_engine import IECore
 
 logger = logging.getLogger()
+logger.setLevel(configuration.logType)
 
 class FacialLandmarksDetectionModel:
 
@@ -27,7 +29,7 @@ class FacialLandmarksDetectionModel:
         unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
         
         
-        if len(unsupported_layers)!=0 and self.device=='CPU':
+        if len(unsupported_layers)>0 and self.device=='CPU':
             logger.warn("unsupported layers found:{}".format(unsupported_layers))
             if not self.extensions==None:
                 logger.info("Adding cpu_extension")
@@ -37,7 +39,7 @@ class FacialLandmarksDetectionModel:
                 if len(unsupported_layers)!=0:
                     logger.error("After adding the extension still unsupported layers found")
                     exit(1)
-                logger.info("After adding the extension the issue is resolved")
+                logger.info("Extension Added, Issue Resolved!")
             else:
                 logger.warn("Give the path of cpu extension")
                 exit(1)
@@ -50,8 +52,8 @@ class FacialLandmarksDetectionModel:
         self.output_shape = self.network.outputs[self.output_names].shape
         
     def predict(self, image):
-        img_processed = self.preprocess_input(image.copy())
-        outputs = self.exec_net.infer({self.input_name:img_processed})
+        image_processed = self.preprocess_input(image.copy())
+        outputs = self.exec_net.infer({self.input_name:image_processed})
         coords = self.preprocess_output(outputs)
         h=image.shape[0]
         w=image.shape[1]
@@ -75,8 +77,8 @@ class FacialLandmarksDetectionModel:
     def preprocess_input(self, image):
         image_convert = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_resized = cv2.resize(image_convert, (self.input_shape[3], self.input_shape[2]))
-        img_processed = np.transpose(np.expand_dims(image_resized,axis=0), (0,3,1,2))
-        return img_processed
+        image_processed = np.transpose(np.expand_dims(image_resized,axis=0), (0,3,1,2))
+        return image_processed
             
 
     def preprocess_output(self, outputs):

@@ -1,4 +1,4 @@
-echo "Initializing Gaze Pointer Controller"
+echo "Initializing Gaze Cursor Controller"
 
 # Using python version 3.5
 python_version=3.5

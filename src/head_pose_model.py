@@ -1,16 +1,15 @@
 import cv2
 import logging
 import numpy as np
+import configuration
 from openvino.inference_engine import IECore
 
 logger = logging.getLogger()
+logger.setLevel(configuration.logType)
 
 class HeadPoseEstimationModel:
 
     def __init__(self, model_name, device='CPU', extensions=None):
-        '''
-        TODO: Use this to set your instance variables.
-        '''
         self.model_name = model_name
         self.device = device
         self.extensions = extensions
@@ -22,30 +21,24 @@ class HeadPoseEstimationModel:
         self.output_names = None
 
     def load_model(self):
-        '''
-        TODO: You will need to complete this method.
-        This method is for loading the model to the device specified by the user.
-        If your model requires any Plugins, this is where you can load them.
-        '''
         self.plugin = IECore()
         
-        model_weights = self.model_name.split(".")[0]+'.bin'
-        self.network = self.plugin.read_network(model=self.model_name, weights=model_weights)
+        model_bin = self.model_name.split(".")[0]+'.bin'
+        self.network = self.plugin.read_network(model=self.model_name, weights=model_bin)
         supported_layers = self.plugin.query_network(network=self.network, device_name=self.device)
         unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
         
         
-        if len(unsupported_layers)!=0 and self.device=='CPU':
+        if len(unsupported_layers)>0 and self.device=='CPU':
             logger.warn("unsupported layers found:{}".format(unsupported_layers))
             if not self.extensions==None:
-                logger.info("Adding cpu_extension")
                 self.plugin.add_extension(self.extensions, self.device)
                 supported_layers = self.plugin.query_network(network = self.network, device_name=self.device)
                 unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
                 if len(unsupported_layers)!=0:
                     logger.error("After adding the extension still unsupported layers found")
                     exit(1)
-                logger.info("After adding the extension the issue is resolved")
+                logger.info("Extension Added, Issue Resolved!")
             else:
                 logger.warn("Give the path of cpu extension")
                 exit(1)
@@ -57,32 +50,21 @@ class HeadPoseEstimationModel:
         self.output_names = [i for i in self.network.outputs.keys()]
         
     def predict(self, image):
-        '''
-        TODO: You will need to complete this method.
-        This method is meant for running predictions on the input image.
-        '''
-        img_processed = self.preprocess_input(image.copy())
-        outputs = self.exec_net.infer({self.input_name:img_processed})
-        finalOutput = self.preprocess_output(outputs)
-        return finalOutput
+        image_processed = self.preprocess_input(image.copy())
+        outputs = self.exec_net.infer({self.input_name:image_processed})
+        result = self.preprocess_output(outputs)
+        return result
         
     def preprocess_input(self, image):
-        '''
-        Before feeding the data into the model for inference,
-        you might have to preprocess it. This function is where you can do that.
-        '''
         image_resized = cv2.resize(image, (self.input_shape[3], self.input_shape[2]))
-        img_processed = np.transpose(np.expand_dims(image_resized,axis=0), (0,3,1,2))
-        return img_processed
+        image_processed = np.transpose(np.expand_dims(image_resized,axis=0), (0,3,1,2))
+        return image_processed
             
 
     def preprocess_output(self, outputs):
-        '''
-        Before feeding the output of this model to the next model,
-        you might have to preprocess the output. This function is where you can do that.
-        '''
-        outs = []
-        outs.append(outputs['angle_y_fc'].tolist()[0][0])
-        outs.append(outputs['angle_p_fc'].tolist()[0][0])
-        outs.append(outputs['angle_r_fc'].tolist()[0][0])
+        outs = [
+			outputs['angle_y_fc'].tolist()[0][0],
+   outputs['angle_p_fc'].tolist()[0][0],
+   outputs['angle_r_fc'].tolist()[0][0]
+		]
         return outs

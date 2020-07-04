@@ -1,12 +1,13 @@
 
-import cv2
 import os
+import sys
+import cv2
+import math
 import time
 import logging
-import math
 import numpy as np
+import configuration
 from argparse import ArgumentParser
-import sys
 from input_feeder import InputFeeder
 from mouse_controller import MouseController
 from face_detection_model import FaceDetectionModel
@@ -18,7 +19,7 @@ f_handler = logging.FileHandler('file.log')
 
 logger = logging.getLogger('gaze_cursor_control')
 
-logger.setLevel(logging.DEBUG)
+logger.setLevel(configuration.logType)
 logger.addHandler(f_handler)
 
 benchmarks = {}
@@ -62,11 +63,11 @@ def build_arg_parser():
     
     return parser
 
-def is_model_exists(filename):
+def check_model_exists(filename):
     if not os.path.isfile(filename):
-            logger.error("Unable to find model ["+filename+"] xml file")
-            return True
-    return False
+            logger.error("Unable to find {} xml file.".format(filename))
+            return False
+    return True
 
 def increase_brightness(img, value=30):
     '''
@@ -85,32 +86,25 @@ def increase_brightness(img, value=30):
 
 def main():
 
-    inputFilePath = args.input
+    inputPath = args.input
     inputFeeder = None
 
-    if inputFilePath.lower()=="cam":
-            inputFeeder = InputFeeder("cam")
-    else:
-        if not os.path.isfile(inputFilePath):
-            logger.error("Unable to find specified video file")
-            exit(1)
-        inputFeeder = InputFeeder("video",inputFilePath)
-    
     # Verify and Load Models
     face_model_link=args.facedetection
     facial_landmark_link=args.faciallandmark
     gaze_estimation_link=args.gazeestimation
     head_pose_link=args.headpose
-    if is_model_exists(face_model_link) and is_model_exists(facial_landmark_link) and is_model_exists(gaze_estimation_link) and is_model_exists(head_pose_link):
-        logger.log("Model not found! closing app...")
+    if not check_model_exists(face_model_link) or not check_model_exists(facial_landmark_link) or not check_model_exists(gaze_estimation_link) or not check_model_exists(head_pose_link):
         exit(1)
-    
+
+
+ 
     device_name = args.device
-    cpu_extension = args.cpu_extension
     threshold = args.prob_threshold
+    cpu_extension = args.cpu_extension
+    previewHeadPose = args.previewHeadPose
     previewFace = args.previewFaceDetection
     previewFaceLandmark = args.previewFaceLandmark
-    previewHeadPose = args.previewHeadPose
     previewGazeEstimation = args.previewGazeEstimation
     
     fliph = True if str(args.flip_horizontal).lower() == "true" else False
@@ -120,6 +114,14 @@ def main():
     facial_landmark_model=FacialLandmarksDetectionModel(facial_landmark_link,device_name,cpu_extension)
     gaze_estimation_model=GazeEstimationModel(gaze_estimation_link,device_name,cpu_extension)
     head_pose_model=HeadPoseEstimationModel(head_pose_link,device_name,cpu_extension)
+
+    if inputPath.lower()=="cam":
+            inputFeeder = InputFeeder("cam")
+    else:
+        if not os.path.isfile(inputPath):
+            logger.error("Unable to find specified video file")
+            exit(1)
+        inputFeeder = InputFeeder("video",inputPath)
 
     # Load Models
     fm_time = time.time()
@@ -144,7 +146,7 @@ def main():
     benchmarks['loadtime']['gaze_estimation'] = gem_time
     benchmarks['loadtime']['head_pose_estimation'] = hpm_time
 
-    mouse_controller = MouseController('medium','medium')
+    mouse_controller = MouseController('high','slow')
     inputFeeder.load_data()
 
     frame_count = 0
@@ -255,7 +257,8 @@ def main():
         
         if frame_count%5 == 0:
             logger.debug("moving mouse: {}".format(gaze_vector[0],gaze_vector[1]))
-            mouse_controller.move(gaze_vector[0],gaze_vector[1])    
+            mouse_controller.move(gaze_vector[0],gaze_vector[1])  
+
     logger.info("Video Stream Finished...")
     cv2.destroyAllWindows()
     inputFeeder.close()

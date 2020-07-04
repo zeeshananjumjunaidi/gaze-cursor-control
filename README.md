@@ -5,11 +5,24 @@ Gaze Cursor Control program is designed to controll mouse pointer using realtime
 ## Project Set Up and Installation
 
 ### Step: 1
-Clone the repository: https://github.com/zeeshananjumjunaidi/gaze-cursor-control
+Make sure you have installed **openVINO 2020.2.+**
 ### Step: 2
+Clone the repository: https://github.com/zeeshananjumjunaidi/gaze-cursor-control
+### Step: 4
+- Make sure you have installed python3.5
+- for Linux run ```python -m pip install -r requirements.txt```
+- for Windows run ```python -m pip install -r requirements-win.txt```
+
+### Step: 5
 Initialize the openVINO environment:
+
+**Linux**
 ```
 source /opt/intel/openvino/bin/setupvars.sh -pyver 3.5
+```
+**Windows**
+```
+<openvino-directory\bin\setupvars.bat>
 ```
 ### Step 3
 Download following models by using OpenVINO model downloader
@@ -34,20 +47,20 @@ python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py
 ## Demo
 
 Edit run.sh and update the path of models.
+- Linux
 
 Open terminal and navigate to project root directory.
 Then run ```./run.sh```
-You can edit run.sh to change parameteres, like if you want to provide video file input or use model from different location etc...
+You can edit run.sh to change parameters, like if you want to provide video file input or use model from different location etc...
 
-Paramters can be changed in run.sh
-All variables are self explanatory.
+- Windows
 
-- **FACE_DETECTION_MODEL** \<Path of xml file of face detection model>
-- **LANDMARKS_REGRESSION_MODEL** \<Path of xml file of facial landmarks detection model>
-- **HEAD_POSE_ESTIMATION_MODEL** \<Path of xml file of head pose estimation model>
-- **GAZE_ESTIMATION_MODEL** \<Path of xml file of gaze estimation model>
-- **INPUT** \<Path of video file or camera, input values are either link of video file or "CAM" for camera input> 
-- **DEVICE** \<Use processing unit for inference, values are CPU, GPU, or HETERO:FPGA,CPU>
+Open command prompt and navigate to project root folder.
+Then run ```run.bat```
+You can edit run.bat to change parameters, like if you want to provide video file input or use model from different location etc...
+
+Parameters can be changed in run.sh *(for Linux)* & run.bat *(for Windows)*
+
 
 ## Documentation
 
@@ -58,53 +71,55 @@ All variables are self explanatory.
 - [Head Pose Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_head_pose_estimation_adas_0001_description_head_pose_estimation_adas_0001.html)
 - [Gaze Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_gaze_estimation_adas_0002_description_gaze_estimation_adas_0002.html)
 
-### Paramters
+### App Parameters
 
 ```
-usage: main.py [-h] -f FACEDETECTIONMODEL -fl FACIALLANDMARKMODEL -hp
-               HEADPOSEMODEL -g GAZEESTIMATIONMODEL -i INPUT
-               [-flags PREVIEWFLAGS [PREVIEWFLAGS ...]] [-l CPU_EXTENSION]
-               [-prob PROB_THRESHOLD] [-d DEVICE] -fliph FLIP_HORIZONTAL
+usage: main.py [-h] -f FACEDETECTION -fl FACIALLANDMARK -hp HEADPOSE -g
+               GAZEESTIMATION -i INPUT [-l CPU_EXTENSION]
+               [-prob PROB_THRESHOLD] [-d DEVICE] [-pf] [-pfl] [-php] [-pge]
+               -fliph FLIP_HORIZONTAL
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f FACEDETECTIONMODEL, --facedetectionmodel FACEDETECTIONMODEL
-                        Specify Path to .xml file of Face Detection model.
-  -fl FACIALLANDMARKMODEL, --faciallandmarkmodel FACIALLANDMARKMODEL
-                        Specify Path to .xml file of Facial Landmark Detection
-                        model.
-  -hp HEADPOSEMODEL, --headposemodel HEADPOSEMODEL
-                        Specify Path to .xml file of Head Pose Estimation
-                        model.
-  -g GAZEESTIMATIONMODEL, --gazeestimationmodel GAZEESTIMATIONMODEL
-                        Specify Path to .xml file of Gaze Estimation model.
+  -f FACEDETECTION, --facedetection FACEDETECTION
+                        Path of Face Detection Model .xml file. required*
+  -fl FACIALLANDMARK, --faciallandmark FACIALLANDMARK
+                        Path of Face Landmark Model .xml file. required*
+  -hp HEADPOSE, --headpose HEADPOSE
+                        Path of Head Pose Model .xml file. required*
+  -g GAZEESTIMATION, --gazeestimation GAZEESTIMATION
+                        Path of Gaze Estimation model .xml file. required*
   -i INPUT, --input INPUT
-                        Specify Path to video file or enter cam for webcam
-  -flags PREVIEWFLAGS [PREVIEWFLAGS ...], --previewFlags PREVIEWFLAGS [PREVIEWFLAGS ...]
-                        Specify the flags from fd, fld, hp, ge like --flags fd
-                        hp fld (Seperate each flag by space)for see the
-                        visualization of different model outputs of each
-                        frame,fd for Face Detection, fld for Facial Landmark
-                        Detectionhp for Head Pose Estimation, ge for Gaze
-                        Estimation.
+                        Provide video path or write "cam" for camera
+                        streaming. required*
   -l CPU_EXTENSION, --cpu_extension CPU_EXTENSION
-                        MKLDNN (CPU)-targeted custom layers.Absolute path to a
-                        shared library with thekernels impl.
+                        Provide CPU extension
   -prob PROB_THRESHOLD, --prob_threshold PROB_THRESHOLD
-                        Probability threshold for model to detect the face
-                        accurately from the video frame.
+                        probability threshold for face detection values from
+                        0.1 to 1
   -d DEVICE, --device DEVICE
-                        Specify the target device to infer on: CPU, GPU, FPGA
-                        or MYRIAD is acceptable. Sample will look for a
-                        suitable plugin for device specified (CPU by default)
+                        Target device to be used by OpenVINO.CPU, GPU, FPGA or
+                        MYRIADRead https://docs.openvinotoolkit.org/latest/_do
+                        cs_IE_DG_inference_engine_intro.html for more
+                        information.default: CPU
+  -pf, --previewFaceDetection
+                        Preview face detection
+  -pfl, --previewFaceLandmark
+                        Preview face landmarks
+  -php, --previewHeadPose
+                        Preview head pose
+  -pge, --previewGazeEstimation
+                        Preview gaze esitmation vector
   -fliph FLIP_HORIZONTAL, --flip_horizontal FLIP_HORIZONTAL
-                        Flip input horizontally
+                        Flip input horizontally, incase of video is flipped
+                        horizontally
 ```
 
 ### Project Structure
 
-- .run.sh Main file to run the Gaze Cursor Control pipeline. 
-- src folder contains all models defination, including input feeder, mouse controller, and main pipeline to run.
+- **.run.sh** (for Linux) Main file to run the Gaze Cursor Control pipeline. 
+- **.run.bat**  (for Windows) Main file to run the Gaze Cursor Control pipeline. 
+- src folder contains all models definition, including input feeder, mouse controller, and main pipeline to run.
 - src/main.py Main pipeline file to run this project. This require input of models, video stream, and device to be used for inference.
 - src/mouse_controller.py this file contain MouseController class which take x,y coords., speed, and precision and set those values to actual mouse pointer.
 - src/face_detection_model.py Used for face detection
@@ -112,7 +127,7 @@ optional arguments:
 - src/head_pose_model.py Used for detecting Head pose/ orientation.
 - src/gaze_estimation_model.py Used for gaze prediction given left, right eyes and head pose angles.
 - src/input_feeder.py Contains InputFeeder class to initialize camera and return frame sequentially.
-- models folder contains models provided by the intel for face detection, landmark detection, gaze estimation, and head pose prediction.
+- models folder contains models provided by the Intel for face detection, landmark detection, gaze estimation, and head pose prediction.
 - media folder contains demo input files for testing this program.
 
 ## Benchmarks
@@ -156,10 +171,11 @@ We prefer using lower precision model when we have constraints such as low power
 ### Testing face detection model on different hardware.
 
 I tested Face detection model on multiple devices.
-- CPU - i5-6500te:iei-mustang-f100-a10  - FP32
-- IGPU - i5-6500te:intel-hd-530 - FP32
-- VPU - intel-ncs2 - FP32
-- FPGA - iei-mustang-f100-a10 - FP16
+- **CPU** - i5-6500te:iei-mustang-f100-a10  - FP32
+- **IGPU** - i5-6500te:intel-hd-530 - FP32
+- **VPU** - intel-ncs2 - FP32
+- **FPGA** - iei-mustang-f100-a10 - FP16
+
 
 #### Model Loading Time
 ![Model Loading Time](./images/model-loading-time.png)
