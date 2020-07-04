@@ -24,5 +24,5 @@ DEVICE="CPU"
 
 # To learn all parameters of this program run following command
 # python3.5 src/main.py --help
-python3.5 src/main.py -d $DEVICE  -fliph $FLIP_INPUT_HORIZONTAL --previewFlags "fd" "hp" "fld" "ge" -i $INPUT -f $FACE_DETECTION_MODEL -g $GAZE_ESTIMATION_MODEL -hp $HEAD_POSE_ESTIMATION_MODEL -fl $LANDMARKS_REGRESSION_MODEL
+python3.5 src/main.py -d $DEVICE  -fliph $FLIP_INPUT_HORIZONTAL -pf -pfl -pge -php -i $INPUT -f $FACE_DETECTION_MODEL -g $GAZE_ESTIMATION_MODEL -hp $HEAD_POSE_ESTIMATION_MODEL -fl $LANDMARKS_REGRESSION_MODEL
 

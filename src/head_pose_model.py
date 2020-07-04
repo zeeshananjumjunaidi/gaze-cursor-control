@@ -1,14 +1,12 @@
 import cv2
+import logging
 import numpy as np
 from openvino.inference_engine import IECore
-import logging
 
 logger = logging.getLogger()
 
 class HeadPoseEstimationModel:
-    '''
-    Class for the Face Detection Model.
-    '''
+
     def __init__(self, model_name, device='CPU', extensions=None):
         '''
         TODO: Use this to set your instance variables.
@@ -16,8 +14,6 @@ class HeadPoseEstimationModel:
         self.model_name = model_name
         self.device = device
         self.extensions = extensions
-        self.model_structure = self.model_name
-        self.model_weights = self.model_name.split(".")[0]+'.bin'
         self.plugin = None
         self.network = None
         self.exec_net = None
@@ -32,7 +28,9 @@ class HeadPoseEstimationModel:
         If your model requires any Plugins, this is where you can load them.
         '''
         self.plugin = IECore()
-        self.network = self.plugin.read_network(model=self.model_structure, weights=self.model_weights)
+        
+        model_weights = self.model_name.split(".")[0]+'.bin'
+        self.network = self.plugin.read_network(model=self.model_name, weights=model_weights)
         supported_layers = self.plugin.query_network(network=self.network, device_name=self.device)
         unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
         
@@ -68,10 +66,6 @@ class HeadPoseEstimationModel:
         finalOutput = self.preprocess_output(outputs)
         return finalOutput
         
-
-    def check_model(self):
-        pass
-
     def preprocess_input(self, image):
         '''
         Before feeding the data into the model for inference,

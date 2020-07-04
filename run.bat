@@ -11,9 +11,9 @@ set LANDMARKS_REGRESSION_MODEL="models\intel\landmarks-regression-retail-0009\FP
 
 set FLIP_INPUT_HORIZONTAL="True"
 set INPUT="cam"
-REM set INPUT="bin\demo-win.mp4"
+set INPUT="bin\demo-win.mp4"
 REM Device to use for for inference, values are "CPU", "GPU", "HETERO:FPGA,CPU"
 set DEVICE="CPU"
-python src\main.py -d %DEVICE%  -fliph %FLIP_INPUT_HORIZONTAL% --previewFlags "fd" "hp" "fld" "ge" -i %INPUT% -f %FACE_DETECTION_MODEL% -g %GAZE_ESTIMATION_MODEL% -hp %HEAD_POSE_ESTIMATION_MODEL% -fl %LANDMARKS_REGRESSION_MODEL%
+python src\main.py -d %DEVICE%  -fliph %FLIP_INPUT_HORIZONTAL% -pf -pfl -pge -php -i %INPUT% -f %FACE_DETECTION_MODEL% -g %GAZE_ESTIMATION_MODEL% -hp %HEAD_POSE_ESTIMATION_MODEL% -fl %LANDMARKS_REGRESSION_MODEL%
 
 echo "Program Finished"

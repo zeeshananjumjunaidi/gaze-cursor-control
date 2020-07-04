@@ -3,25 +3,18 @@ This is a sample class for a model. You may choose to use it as-is or make any c
 This has been provided just to give you an idea of how to structure your model class.
 '''
 import cv2
+import logging
 import numpy as np
 from openvino.inference_engine import IECore
-import logging
 
 logger = logging.getLogger()
 
 class FaceDetectionModel:
-    '''
-    Class for the Face Detection Model.
-    '''
+    
     def __init__(self, model_name, device='CPU', extensions=None,threshold=0.5):
-        '''
-        TODO: Use this to set your instance variables.
-        '''
         self.model_name = model_name
         self.device = device
-        self.extensions = extensions
-        self.model_structure = self.model_name
-        self.model_weights = self.model_name.split('.')[0]+'.bin'
+        self.extensions = extensions        
         self.prob_threshold = threshold
         self.plugin = None
         self.network = None
@@ -32,13 +25,9 @@ class FaceDetectionModel:
         self.output_shape = None
 
     def load_model(self):
-        '''
-        TODO: You will need to complete this method.
-        This method is for loading the model to the device specified by the user.
-        If your model requires any Plugins, this is where you can load them.
-        '''
         self.plugin = IECore()
-        self.network = self.plugin.read_network(model=self.model_structure, weights=self.model_weights)
+        model_bin = self.model_name.split('.')[0]+'.bin'
+        self.network = self.plugin.read_network(model=self.model_name, weights=model_bin)
 
 
 
@@ -68,41 +57,29 @@ class FaceDetectionModel:
         self.output_shape = self.network.outputs[self.output_names].shape
 
     def predict(self, image):
-        '''
-        TODO: You will need to complete this method.
-        This method is meant for running predictions on the input image.
-        '''
         img_processed = self.preprocess_input(image.copy())
         outputs = self.exec_net.infer({self.input_name:img_processed})
         coords = self.preprocess_output(outputs, self.prob_threshold)
+
         if (len(coords)==0):
             return 0, 0
-        coords = coords[0] #take the first detected face
-        h=image.shape[0]
-        w=image.shape[1]
+
+        coords = coords[0]
+
+        h,w=image.shape[0],image.shape[1]
+
         coords = coords * np.array([w, h, w, h])
         coords = coords.astype(np.int32)
       
         cropped_face = image[coords[1]:coords[3], coords[0]:coords[2]]
         return cropped_face, coords
 
-    def check_model(self):
-        pass
-
     def preprocess_input(self, image):
-        '''
-        Before feeding the data into the model for inference,
-        you might have to preprocess it. This function is where you can do that.
-        '''
         image_resized = cv2.resize(image, (self.input_shape[3], self.input_shape[2]))
         img_processed = np.transpose(np.expand_dims(image_resized,axis=0), (0,3,1,2))
         return img_processed
 
     def preprocess_output(self, outputs,probability):
-        '''
-        Before feeding the output of this model to the next model,
-        you might have to preprocess the output. This function is where you can do that.
-        '''
         coords =[]
         outs = outputs[self.output_names][0][0]
         for out in outs:
