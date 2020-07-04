@@ -1,6 +1,6 @@
 # Computer Pointer Controller
 
-Gaze Cursor Control program is designed to controll mouse pointer using realtime gaze input. This will also include the head orientation. User can provide either video or live camera streaming as input.
+Gaze Cursor Control program is designed to control mouse pointer using real time video input. User can provide either video or live camera streaming as input.
 
 ## Project Set Up and Installation
 
