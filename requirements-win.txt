@@ -1,0 +1,6 @@
+image
+numpy=1.11.1
+Pillow
+requests
+opencv-python
+pyautogui
