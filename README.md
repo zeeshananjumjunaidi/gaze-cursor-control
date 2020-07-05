@@ -27,22 +27,46 @@ source /opt/intel/openvino/bin/setupvars.sh -pyver 3.5
 ### Step 3
 Download following models by using OpenVINO model downloader
 
+**Linux**
+
 - **1. Face Detection Model**
 ```
-python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "face-detection-adas-binary-0001"
+python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "face-detection-adas-binary-0001"  --output_dir models/intel
 ```
 - **2. Facial Landmarks Detection Model**
 ```
-python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "landmarks-regression-retail-0009"
+python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "landmarks-regression-retail-0009"  --output_dir models/intel
 ```
 - **3. Head Pose Estimation Model**
 ```
-python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "head-pose-estimation-adas-0001"
+python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "head-pose-estimation-adas-0001"  --output_dir models/intel
 ```
 - **4. Gaze Estimation Model**
 ```
-python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "gaze-estimation-adas-0002"
+python /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "gaze-estimation-adas-0002"  --output_dir models/intel
 ```
+
+**Windows**
+
+- **1. Face Detection Model**
+```
+python <openvino-directory>/deployment_tools/tools/model_downloader/downloader.py --name "face-detection-adas-binary-0001"  --output_dir models/intel
+```
+- **2. Facial Landmarks Detection Model**
+```
+python <openvino-directory>/deployment_tools/tools/model_downloader/downloader.py --name "landmarks-regression-retail-0009"  --output_dir models/intel
+```
+- **3. Head Pose Estimation Model**
+```
+python <openvino-directory>/deployment_tools/tools/model_downloader/downloader.py --name "head-pose-estimation-adas-0001"  --output_dir models/intel
+```
+- **4. Gaze Estimation Model**
+```
+python <openvino-directory>/deployment_tools/tools/model_downloader/downloader.py --name "gaze-estimation-adas-0002"  --output_dir models/intel
+```
+
+
+
 
 ## Demo
 
