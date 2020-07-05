@@ -4,54 +4,13 @@ import logging
 import numpy as np
 import configuration
 from openvino.inference_engine import IECore
+from openvino_model import OpenVIINOModel
 
 logger = logging.getLogger()
 logger.setLevel(configuration.logType)
 
-class GazeEstimationModel:
+class GazeEstimationModel(OpenVIINOModel):
 
-    def __init__(self, model_name, device='CPU', extensions=None):
-        self.model_name = model_name
-        self.device = device
-        self.extensions = extensions
-        self.plugin = None
-        self.network = None
-        self.exec_net = None
-        self.input_name = None
-        self.input_shape = None
-        self.output_names = None
-        self.output_shape = None
-
-    def load_model(self):
-        self.plugin = IECore()        
-        model_bin = self.model_name.split(".")[0]+'.bin'
-        self.network = self.plugin.read_network(model=self.model_name, weights=model_bin)
-        supported_layers = self.plugin.query_network(network=self.network, device_name=self.device)
-        unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
-        
-        
-        if len(unsupported_layers)>0 and self.device=='CPU':
-            logger.warn("unsupported layers found:{}".format(unsupported_layers))
-            if not self.extensions==None:
-                logger.info("Adding cpu_extension")
-                self.plugin.add_extension(self.extensions, self.device)
-                supported_layers = self.plugin.query_network(network = self.network, device_name=self.device)
-                unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
-                if len(unsupported_layers)!=0:
-                    logger.error("After adding the extension still unsupported layers found")
-                    exit(1)
-                logger.info("Extension Added, Issue Resolved!")
-            else:
-                logger.warn("Give the path of cpu extension")
-                exit(1)
-                
-        self.exec_net = self.plugin.load_network(network=self.network, device_name=self.device,num_requests=1)
-        
-        self.input_name = [i for i in self.network.inputs.keys()]
-        self.input_shape = self.network.inputs[self.input_name[1]].shape
-        self.output_names = [i for i in self.network.outputs.keys()]
-
-        
     def predict(self, left_eye_image, right_eye_image, hpa):
         le_image_processed, re_image_processed = self.preprocess_input(left_eye_image.copy(), right_eye_image.copy())
         outputs = self.exec_net.infer({'head_pose_angles':hpa, 'left_eye_image':le_image_processed, 'right_eye_image':re_image_processed})
@@ -69,8 +28,8 @@ class GazeEstimationModel:
         return False,False
             
 
-    def preprocess_output(self, outputs,hpa):      
-        gaze_vector = outputs[self.output_names[0]].tolist()[0]
+    def preprocess_output(self, outputs,hpa):
+        gaze_vector = outputs[self.output_names].tolist()[0]
         xdir = -1 if gaze_vector[0]<0 else 1
         ydir = -1 if gaze_vector[1]<0 else 1
 

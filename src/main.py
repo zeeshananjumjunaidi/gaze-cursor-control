@@ -233,7 +233,7 @@ def main():
                 # head pose
                 head_pose_y = head_output[1] * math.pi / 180
 
-                line_size = 20
+                line_size = configuration.GAZE_ARROW_LENGTH
                 
                 # z-axis
                 cv2.arrowedLine(croppedFace,(left_eye_center_x,left_eye_center_y),(left_eye_center_dx,left_eye_center_dy),(0,255,255),1)
@@ -248,14 +248,14 @@ def main():
                 cv2.arrowedLine(croppedFace,(right_eye_center_x,right_eye_center_y),(right_eye_center_x,right_eye_center_y-line_size),(0,255,0),1)
 
             if previewHeadPose:
-                cv2.rectangle(preview_frame,(5,5),(85,65),(0,255,0),1)
-                cv2.putText(preview_frame,"YAW: {:.2f}".format(head_output[0]), (10, 20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0, 255, 0), 1)
-                cv2.putText(preview_frame,"PITCH: {:.2f}".format(head_output[1]), (10, 40), cv2.FONT_HERSHEY_PLAIN, 0.5, (0, 255, 0), 1)
-                cv2.putText(preview_frame,"ROLL: {:.2f}".format(head_output[2]), (10, 60), cv2.FONT_HERSHEY_PLAIN, 0.5, (0, 255, 0), 1)
+                cv2.rectangle(preview_frame,(5,5),(85,65), configuration.UI_COLOR,1)
+                cv2.putText(preview_frame,"YAW: {:.2f}".format(head_output[0]), (10, 20), configuration.DEFAULT_FONT, configuration.FONT_SIZE, configuration.UI_COLOR, 1)
+                cv2.putText(preview_frame,"PITCH: {:.2f}".format(head_output[1]), (10, 40), configuration.DEFAULT_FONT, configuration.FONT_SIZE,  configuration.UI_COLOR, 1)
+                cv2.putText(preview_frame,"ROLL: {:.2f}".format(head_output[2]), (10, 60), configuration.DEFAULT_FONT, configuration.FONT_SIZE,  configuration.UI_COLOR, 1)
 
-            cv2.imshow("visualization",cv2.resize(preview_frame,(500,500)))
+            cv2.imshow("Gaze Detection [VIsualization]",cv2.resize(preview_frame,(configuration.PREVIEW_WIDTH,configuration.PREVIEW_HEIGHT)))
         
-        if frame_count%5 == 0:
+        if frame_count % configuration.MOVE_MOUSE_AFTER_FRAMES_COUNT == 0:
             logger.debug("moving mouse: {}".format(gaze_vector[0],gaze_vector[1]))
             mouse_controller.move(gaze_vector[0],gaze_vector[1])  
 

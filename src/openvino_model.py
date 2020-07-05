@@ -4,13 +4,12 @@ import numpy as np
 import configuration
 from openvino.inference_engine import IECore
 
+logger = logging.getLogger()
+logger.setLevel(configuration.logType)
 
 class OpenVIINOModel():
 
     def __init__(self, model_name, device='CPU', extensions=None):
-        self.model_name = model_name
-        self.device = device
-        self.extensions = extensions
         self.plugin = None
         self.network = None
         self.exec_net = None
@@ -18,6 +17,12 @@ class OpenVIINOModel():
         self.input_shape = None
         self.output_names = None
         self.output_shape = None
+
+        self.device = device
+        self.model_name = model_name
+        self.extensions = extensions
+
+        logger.debug("Model Initialized: {}".format(model_name))
 
 
     def load_model(self):
@@ -29,13 +34,14 @@ class OpenVIINOModel():
         unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
         
         if len(unsupported_layers)>0 and self.device=='CPU':
-            logger.warn("unsupported layers found:{}".format(unsupported_layers))
+            logger.warn("Unsupported layers found:{}".format(unsupported_layers))
             if not self.extensions==None:
-                logger.info("Adding cpu_extension")
                 self.plugin.add_extension(self.extensions, self.device)
+
                 supported_layers = self.plugin.query_network(network = self.network, device_name=self.device)
                 unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
-                if len(unsupported_layers)!=0:
+
+                if len(unsupported_layers) != 0:
                     logger.error("Even after adding the extension still unsupported layer[s] found")
                     exit(1)
                 logger.info("Extension Added, Issue Resolved!")

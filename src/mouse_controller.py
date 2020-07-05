@@ -20,8 +20,7 @@ class MouseController:
         self.precision=precision_dict[precision]
         self.speed=speed_dict[speed]
 
-
-    def move(self, x, y):
+    def move(self,x,y):
         dx=x
         dy=y
         if self.is_windows:
@@ -38,3 +37,4 @@ class MouseController:
         elif current_y+dy>=self.max_height:
             dy=self.max_height-1        
         pyautogui.moveRel(dx*self.precision, -1*dy*self.precision, duration=self.speed)
+

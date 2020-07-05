@@ -37,6 +37,7 @@ class InputFeeder:
         while True:
             for _ in range(10):
                 ret, frame=self.cap.read()
+                cv2.waitKey(25) # To maintain normal speed
             yield ret,frame
 
 

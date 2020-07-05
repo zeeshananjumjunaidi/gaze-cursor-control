@@ -7,89 +7,46 @@ import logging
 import numpy as np
 import configuration
 from openvino.inference_engine import IECore
-
+from openvino_model import OpenVIINOModel
 #from openvino.inference_engine import IECore
 
 logger = logging.getLogger()
 logger.setLevel(configuration.logType)
-class FaceDetectionModel:
+
+class FaceDetectionModel(OpenVIINOModel):
     
     def __init__(self, model_name, device='CPU', extensions=None,threshold=0.5):
-        self.plugin = None
-        self.network = None
-        self.exec_net = None
-        self.input_name = None
-        self.input_shape = None
-        self.output_names = None
-        self.output_shape = None
-        
-        self.device = device
-        self.model_name = model_name
-        self.extensions = extensions        
+        super(FaceDetectionModel,self).__init__(model_name,device,extensions)      
         self.prob_threshold = threshold
 
-    def load_model(self):
-        self.plugin = IECore()
-        model_bin = self.model_name.split('.')[0]+'.bin'
-        self.network = self.plugin.read_network(model=self.model_name, weights=model_bin)
-
-        supported_layers = self.plugin.query_network(network=self.network, device_name=self.device)
-        unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
-        
-        if len(unsupported_layers)>0 and self.device=='CPU':
-            logger.warn("unsupported layers found:{}".format(unsupported_layers))
-            if not self.extensions==None:
-                logger.info("Adding cpu_extension")
-                self.plugin.add_extension(self.extensions, self.device)
-                supported_layers = self.plugin.query_network(network = self.network, device_name=self.device)
-                unsupported_layers = [l for l in self.network.layers.keys() if l not in supported_layers]
-                if len(unsupported_layers)!=0:
-                    logger.error("Even after adding the extension still unsupported layer[s] found")
-                    exit(1)
-                logger.info("Extension Added, Issue Resolved!")
-            else:
-                logger.warn("Give the path of cpu extension")
-                exit(1)
-                
-        self.exec_net = self.plugin.load_network(network=self.network, device_name=self.device,num_requests=1)
-        
-        self.input_name = next(iter(self.network.inputs))
-        self.input_shape = self.network.inputs[self.input_name].shape
-        self.output_names = next(iter(self.network.outputs))
-        self.output_shape = self.network.outputs[self.output_names].shape
-
     def predict(self, image):
-        image_processed = self.preprocess_input(image.copy())
-        outputs = self.exec_net.infer({self.input_name:image_processed})
-        coords = self.preprocess_output(outputs, self.prob_threshold)
+        frame = self.preprocess_input(image.copy())        
+        h,w=image.shape[0],image.shape[1]
+
+        outputs = self.exec_net.infer({self.input_name:frame})
+        coords = self.preprocess_output(outputs,h,w, self.prob_threshold)
 
         if len(coords)==0:
             return 0, 0
 
-        coords = coords[0]
-
-        h,w=image.shape[0],image.shape[1]
-
-        coords = coords * np.array([w, h, w, h])
-        coords = coords.astype(np.int32)
+        first_face = coords[0]
+        first_face = np.array(first_face,np.int32)
       
-        cropped_image = image[coords[1]:coords[3], coords[0]:coords[2]]
-        return cropped_image, coords
+        cropped_image = image[first_face[1]:first_face[3], first_face[0]:first_face[2]]
+        return cropped_image, first_face
 
     def preprocess_input(self, image):
-        image_resized = cv2.resize(image, (self.input_shape[3], self.input_shape[2]))
-        image_processed = np.transpose(np.expand_dims(image_resized,axis=0), (0,3,1,2))
-        return image_processed
+        resized_image = cv2.resize(image, (self.input_shape[3], self.input_shape[2]))
+        frame = np.transpose(np.expand_dims(resized_image,axis=0), (0,3,1,2))
+        return frame
 
-    def preprocess_output(self, outputs,probability):
+    def preprocess_output(self, outputs,height, width, threshold):
         coords =[]
-        data = outputs[self.output_names][0][0]
-        for out in data:
+        network_output = outputs[self.output_names][0][0]
+        for out in network_output:
             conf = out[2]
-            if conf>probability:
-                x_min=out[3]
-                y_min=out[4]
-                x_max=out[5]
-                y_max=out[6]
+            if conf>threshold:
+                x_min,y_min=out[3] * width , out[4] * height
+                x_max,y_max=out[5] * width , out[6] * height
                 coords.append([x_min,y_min,x_max,y_max])
         return coords
