@@ -235,17 +235,9 @@ def main():
 
                 line_size = configuration.GAZE_ARROW_LENGTH
                 
-                # z-axis
+                # gaze-axis
                 cv2.arrowedLine(croppedFace,(left_eye_center_x,left_eye_center_y),(left_eye_center_dx,left_eye_center_dy),(0,255,255),1)
                 cv2.arrowedLine(croppedFace,(right_eye_center_x,right_eye_center_y),(right_eye_center_dx,right_eye_center_dy),(0,255,255),1)
-
-                # x-axis
-                cv2.arrowedLine(croppedFace,(left_eye_center_x,left_eye_center_y),(left_eye_center_x-line_size,left_eye_center_y),(0,0,255),1)
-                cv2.arrowedLine(croppedFace,(right_eye_center_x,right_eye_center_y),(right_eye_center_x-line_size,right_eye_center_y),(0,0,255),1)
-                
-                # y-axis
-                cv2.arrowedLine(croppedFace,(left_eye_center_x,left_eye_center_y),(left_eye_center_x,left_eye_center_y-line_size),(0,255,0),1)
-                cv2.arrowedLine(croppedFace,(right_eye_center_x,right_eye_center_y),(right_eye_center_x,right_eye_center_y-line_size),(0,255,0),1)
 
             if previewHeadPose:
                 cv2.rectangle(preview_frame,(5,5),(85,65), configuration.UI_COLOR,1)
@@ -256,7 +248,7 @@ def main():
             cv2.imshow("Gaze Detection [VIsualization]",cv2.resize(preview_frame,(configuration.PREVIEW_WIDTH,configuration.PREVIEW_HEIGHT)))
         
         if frame_count % configuration.MOVE_MOUSE_AFTER_FRAMES_COUNT == 0:
-            logger.debug("moving mouse: {}".format(gaze_vector[0],gaze_vector[1]))
+            logger.debug("moving mouse = x: {},y: {}".format(gaze_vector[0],gaze_vector[1]))
             mouse_controller.move(gaze_vector[0],gaze_vector[1])  
 
     logger.info("Video Stream Finished...")

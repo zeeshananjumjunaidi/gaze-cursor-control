@@ -156,7 +156,7 @@ optional arguments:
 
 ## Benchmarks
 
-Average result
+Following result is taken on Virtual Machine (Intel® Core™ i7-7700 Processor @4.40GHz).
 
 |            Name           | Model Load Time FP32 | Inference time (FP32) |
 |:-------------------------:|:------------:|:--------------------------:|
@@ -174,20 +174,71 @@ Average result
 | Gaze Estimation           | 0.170       | 0.003                    |
 | **Total Average Inference**   | 0.199       | 0.004                    |
 
-
-
 |   Model Type  |   FPS     |
 |:----------:|:------------:|
 |   FP32        |  ~13FPS    |
 |   FP16        |  ~12FPS         |
 
 
+
+Result on Intel® Core™ i7-4702MQ @ 2.20GHz Processor
+
+|            Name           | Model Load Time FP32 | Inference time (FP32) |
+|:-------------------------:|:------------:|:--------------------------:|
+| Face detection            | 0.6873111724853516        | 0.030996084213256836                      |
+| Face Landmark detection   | 0.2661552429199219        | 0.0010018348693847656                      |
+| Head Pose Estimation      | 0.21300029754638672        | 0.001981973648071289                      |
+| Gaze Estimation           | 0.24499297142028809        | 0.002998828887939453                      |
+| **Total Average**         | 0.3528649210929870775      |  0.0092446804046630859                      |
+
+|            Name           | Model Load Time FP16 | Inference time (FP16) |
+|:-------------------------:|:------------:|:------------------------:|
+| Face detection            | 0.5799996852874756           | 0.028020381927490234                      |
+| Facial Landmark detection | 0.16299867630004883        | 0.0010178089141845703                    |
+| Head Pose detection       | 0.17101383209228516        | 0.0009822845458984375                    |
+| Gaze Estimation           | 0.21700549125671387       | 0.0029838085174560547                    |
+| **Total Average Inference**   | 0.282754421234130865      | 0.008251070976257324125                    |
+
+|   Model Type  |   FPS     |
+|:----------:|:------------:|
+|   FP32        |  ~14FPS    |
+|   FP16        |  ~16FPS         |
+
+Result on IGPU Intel® HD Graphics 4600
+
+|            Name           | Model Load Time FP32 | Inference time (FP32) |
+|:-------------------------:|:------------:|:--------------------------:|
+| Face detection            | 0.3946526050567627        |  0.026006698608398438                      |
+| Face Landmark detection   | 0.16802239418029785        | 0.0009887218475341797                      |
+| Head Pose Estimation      | 0.18301916122436523        | 0.002997159957885742                      |
+| Gaze Estimation           | 0.22898149490356445        | 0.0020008087158203125                      |
+| **Total Average**         | 0.243668914      |  0.007998347                     |
+
+|            Name           | Model Load Time FP16 | Inference time (FP16) |
+|:-------------------------:|:------------:|:------------------------:|
+| Face detection            | 0.5998866558074951          | 0.026001930236816406                      |
+| Facial Landmark detection | 0.17197704315185547         | 0.0009853839874267578                    |
+| Head Pose detection       | 0.18929433822631836         | 0.0020143985748291016                    |
+| Gaze Estimation           | 0.22699999809265137         | 0.0020155906677246094                    |
+| **Total Average Inference**   | 0.282754421234130865      | 0.007754326                    |
+
+|   Model Type  |   FPS     |
+|:----------:|:------------:|
+|   FP32        |  ~16FPS    |
+|   FP16        |  ~16FPS         |
+
+
 ## Results
 
 I tested this program on Intel i7 (7700K) VM. From the results, it seems like FP16 too long time for loading, but for i7 (7700K) loading time is low and there is not much difference in model inference as FPS are almost similar in both type of the models.
 Higher floating point precision usually have higher accuracy.
-Normally precision model usually takes more time for inference than lower precision models.
-From the result, we can see that loading time of FP16 is slower than the FP32 by 10ms.
+
+Normally higher precision model usually takes more time for inference than lower precision models.
+
+From the result, we can see that loading time and inference time of FP16 is slower than the FP32 by 10ms in virtual machine although
+it is running on i7 7700 4.40GHz. While on i7 4702MQ 2.20GHz, FP16 seems faster than FP32 by average of 2FPS and 0.20ms.
+
+
 We prefer using lower precision model when we have constraints such as low power consumption and less processing power.
 
 <hr/>
