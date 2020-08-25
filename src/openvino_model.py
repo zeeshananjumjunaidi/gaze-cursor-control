@@ -7,7 +7,7 @@ from openvino.inference_engine import IECore
 logger = logging.getLogger()
 logger.setLevel(configuration.logType)
 
-class OpenVIINOModel():
+class OpenVINOModel():
 
     def __init__(self, model_name, device='CPU', extensions=None):
         self.plugin = None
