@@ -3,12 +3,12 @@ import logging
 import numpy as np
 import configuration
 from openvino.inference_engine import IECore
-from openvino_model import OpenVIINOModel
+from openvino_model import OpenVINOModel
 
 logger = logging.getLogger()
 logger.setLevel(configuration.logType)
 
-class HeadPoseEstimationModel(OpenVIINOModel):
+class HeadPoseEstimationModel(OpenVINOModel):
 
     def predict(self, image):
         image_processed = self.preprocess_input(image.copy())
