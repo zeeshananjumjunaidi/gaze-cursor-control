@@ -7,13 +7,13 @@ import logging
 import numpy as np
 import configuration
 from openvino.inference_engine import IECore
-from openvino_model import OpenVIINOModel
+from openvino_model import OpenVINOModel
 #from openvino.inference_engine import IECore
 
 logger = logging.getLogger()
 logger.setLevel(configuration.logType)
 
-class FaceDetectionModel(OpenVIINOModel):
+class FaceDetectionModel(OpenVINOModel):
     
     def __init__(self, model_name, device='CPU', extensions=None,threshold=0.5):
         super(FaceDetectionModel,self).__init__(model_name,device,extensions)      
