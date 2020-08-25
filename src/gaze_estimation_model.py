@@ -4,12 +4,12 @@ import logging
 import numpy as np
 import configuration
 from openvino.inference_engine import IECore
-from openvino_model import OpenVIINOModel
+from openvino_model import OpenVINOModel
 
 logger = logging.getLogger()
 logger.setLevel(configuration.logType)
 
-class GazeEstimationModel(OpenVIINOModel):
+class GazeEstimationModel(OpenVINOModel):
 
     def predict(self, left_eye_image, right_eye_image, hpa):
         le_image_processed, re_image_processed = self.preprocess_input(left_eye_image.copy(), right_eye_image.copy())
